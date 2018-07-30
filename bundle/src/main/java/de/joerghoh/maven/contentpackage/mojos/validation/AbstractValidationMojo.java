@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package de.joerghoh.maven.contentpackagevalidation.mojos;
+package de.joerghoh.maven.contentpackage.mojos.validation;
 
 import java.io.File;
 import java.io.IOException;
