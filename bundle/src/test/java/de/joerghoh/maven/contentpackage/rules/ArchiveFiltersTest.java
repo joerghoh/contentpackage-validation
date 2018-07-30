@@ -5,6 +5,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.Before;
@@ -41,10 +44,11 @@ public class ArchiveFiltersTest {
 	@Test
 	public void testFilters() throws IOException {
 		ArchiveEntry root = zipArchive.getRoot();
-		assertFalse(root.getStream()
+		List<ArchiveEntry> jcrNodes = root.getStream()
 			.filter(ArchiveFilters.isJcrPath)
-			.findFirst().isPresent()
-		);
+			.collect(Collectors.toList());
+		Optional<ArchiveEntry> appsFolder = root.getNode("/jcr_root/apps");
+		assertTrue(jcrNodes.contains(appsFolder.get()));
 		
 		
 	}

@@ -8,13 +8,13 @@ import de.joerghoh.maven.contentpackage.beans.ArchiveEntry;
 
 public class ArchiveFilters {
 	
-	static Pattern installFolder = Pattern.compile("jcr_content/(libs|apps)/.+/install.*/[^/]+.jar");
-	static Pattern configFolder = Pattern.compile("jcr_content/(libs|apps)/.+/conf.*/[^/]+");
+	static Pattern installFolder = Pattern.compile("jcr_root/(libs|apps)/.+/install.*/[^/]+.jar");
+	static Pattern configFolder = Pattern.compile("jcr_root/(libs|apps)/.+/conf.*/[^/]+");
 	
 	
 	static Predicate<ArchiveEntry> isBundle = ae ->  installFolder.matcher(ae.getAbsolutePath()).find();
 
-	static Predicate<ArchiveEntry> isJcrPath = ae -> ae.getAbsolutePath().startsWith("jcr_content/");
+	static Predicate<ArchiveEntry> isJcrPath = ae -> ae.getAbsolutePath().startsWith("jcr_root/");
 	
 	
 	BiPredicate<ArchiveEntry,String> jcrPath = (ae,path) -> {
