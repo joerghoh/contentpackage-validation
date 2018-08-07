@@ -21,6 +21,7 @@
 package de.joerghoh.maven.contentpackage.mojos.validation;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,6 +32,10 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
+import de.joerghoh.maven.contentpackage.beans.ArchiveBean;
+import de.joerghoh.maven.contentpackage.beans.ArchiveEntry;
+import de.joerghoh.maven.contentpackage.beans.ZipArchiveBean;
+
 @Mojo (name="validate", defaultPhase=LifecyclePhase.VERIFY, requiresProject=false )
 public class ContentValidationMojo extends AbstractValidationMojo {
 	
@@ -40,13 +45,16 @@ public class ContentValidationMojo extends AbstractValidationMojo {
 	ArrayList<String> whitelistedPaths;
 	
 	@Parameter (property="validation.filename", defaultValue="${project.build.directory}/${project.build.finalName}")
-	private File target;
+	protected File target;
 	
 	@Parameter(property="validation.breakBuildOnValiationFailures", defaultValue="false")
 	private boolean breakBuild;
 	
 	@Parameter(property="validation.allowSubpackages", defaultValue="true")
 	private boolean allowSubpackages;
+	
+	List<String> positiveStatements = new ArrayList<>();
+	List<String> negativeStatements = new ArrayList<>();
 
 
 	@Override
@@ -59,31 +67,99 @@ public class ContentValidationMojo extends AbstractValidationMojo {
 			getLog().error(String.format("File %s does not exist", target.getAbsolutePath()));
 			return;
 		}
+		processRules();
 
-		reportViolations(validatePackage(target));
+		try {
+			ArchiveBean archive = new ZipArchiveBean (target);
+			reportViolations(validateArchive(archive));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();	
+		}
 		
 	}
+	
+	protected void processRules() {
 
-	/**
-	 * Validate the content package
-	 * @param zipFile the input file
-	 * @return the policy violations
-	 */
-	private List<String> validatePackage(File zipFile) {
+		whitelistedPaths.forEach(regex -> {
+			if (regex.startsWith("!")) {
+				negativeStatements.add(regex.substring(1));
+			} else {
+				positiveStatements.add(regex);
+				
+			}
+		});
+	}
+	
+	public List<String> validateArchive (ArchiveBean archive) throws IOException {
 		List<String> policyViolations = new ArrayList<>();
-		List<ContentPackageEntry> violations = getFileContent(zipFile).stream()
-			.filter (cpe -> filterPathViolations(cpe,policyViolations))
-			.filter (cpe -> checkForSubpackages(cpe, policyViolations))
+		archive.getRoot().getStream()
+			.filter(e -> filterPathViolations(e,policyViolations))
+			.filter(e -> checkForSubpackages(e, policyViolations))
 			.collect(Collectors.toList());
+		
+		archive.getSubpackages().forEach (s -> {
+			try {
+				policyViolations.addAll(validateArchive(s));
+			} catch (IOException e1) {
+				getLog().error(e1);
+			}
+		});
+		
 		return policyViolations;
 	}
+	
+	
+	/**
+	 * validate a content package entry against the path filter rules
+	 * @param entry
+	 * @param policyViolations the list of violations
+	 * @return false if the violation is deteced, true otherwise
+	 */
+	boolean filterPathViolations (ArchiveEntry entry, List<String> policyViolations) {
+		
+
+			
+		// there must be at least 1 match on the positiveStatement list
+		boolean positiveMatch = positiveStatements.stream()
+				.filter((String regex) -> entry.getAbsolutePath().matches(regex))
+				.findFirst().isPresent();
+		
+		// but no match on the negativeStatement list
+		boolean negativeMatch = negativeStatements.stream()
+				.filter((String regex) -> entry.getAbsolutePath().matches(regex))
+				.findFirst().isPresent();
+		
+		getLog().debug(String.format("%s: positiveMatch=%s, negativeMatch=%s",entry.getAbsolutePath(),positiveMatch, negativeMatch));
+		boolean isCompliant = (positiveMatch && !negativeMatch);
+		if (! isCompliant) {
+			String msg = String.format("detected violation of path rules: %s", entry.toString());
+			getLog().debug(msg);
+			policyViolations.add(msg);
+		}
+		return isCompliant;
+	}
+	
+	boolean checkForSubpackages (ArchiveEntry archiveEntry, List<String> policyViolations) {
+		boolean isSubPackage = archiveEntry.getAbsolutePath().matches(SUBPACKAGE_EXPRESSION);
+		if (isSubPackage && !allowSubpackages) {
+			String msg = String.format("[%s] detected subpackage at: %s", archiveEntry.toString(),archiveEntry.getAbsolutePath());
+			policyViolations.add(msg);
+		}
+		return !isSubPackage;
+	}
+	
+	
+	
+	
+	/////////////////////////////
 	
 	/**
 	 * report policy violations
 	 * @param policyViolations
 	 * @throws MojoExecutionException
 	 */
-	private void reportViolations(List<String> policyViolations) throws MojoExecutionException {
+	protected void reportViolations(List<String> policyViolations) throws MojoExecutionException {
 		if (policyViolations.size() > 0) {
 			String msg = String.format("%d violation(s) against policy (%s)", policyViolations.size(), getPolicyString()); 
 			getLog().warn(msg);
@@ -92,56 +168,6 @@ public class ContentValidationMojo extends AbstractValidationMojo {
 				throw new MojoExecutionException("policy violation detected, please check build logs");
 			}
 		}
-	}
-	
-	/**
-	 * validate a content package entry against the path filter rules
-	 * @param cpe
-	 * @param policyViolations the list of violations
-	 * @return false if the violation is deteced, true otherwise
-	 */
-	boolean filterPathViolations (ContentPackageEntry cpe, List<String> policyViolations) {
-		
-		List<String> positiveStatements = new ArrayList<>();
-		List<String> negativeStatements = new ArrayList<>();
-		
-		whitelistedPaths.forEach(regex -> {
-			//getLog().info(String.format("checking %s", regex));
-			if (regex.startsWith("!")) {
-				negativeStatements.add(regex.substring(1));
-			} else {
-				positiveStatements.add(regex);
-				
-			}
-		});
-			
-		// there must be at least 1 match on the positiveStatement list
-		boolean positiveMatch = positiveStatements.stream()
-				.filter((String regex) -> cpe.getPath().matches(regex))
-				.findFirst().isPresent();
-		
-		// but no match on the negativeStatement list
-		boolean negativeMatch = negativeStatements.stream()
-				.filter((String regex) -> cpe.getPath().matches(regex))
-				.findFirst().isPresent();
-		
-		//getLog().info(String.format("%s: positiveMatch=%s, negativeMatch=%s",cpe.getPath(),positiveMatch, negativeMatch));
-		boolean isCompliant = (positiveMatch && !negativeMatch);
-		if (! isCompliant) {
-			String msg = String.format("[%s] detected violation of path rules: %s", cpe.getArchiveFilename(),cpe.getPath());
-			getLog().debug(msg);
-			policyViolations.add(msg);
-		}
-		return isCompliant;
-	}
-	
-	boolean checkForSubpackages (ContentPackageEntry cpe, List<String> policyViolations) {
-		boolean isSubPackage = cpe.getPath().matches(SUBPACKAGE_EXPRESSION);
-		if (isSubPackage && !allowSubpackages) {
-			String msg = String.format("detected subpackage at: %s", cpe.getPath());
-			policyViolations.add(msg);
-		}
-		return !isSubPackage;
 	}
 	
 

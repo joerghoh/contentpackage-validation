@@ -149,6 +149,12 @@ public class ArchiveEntry {
 		return result;
 	}
 	
+	public ArchiveBean getArchive() {
+		return parentArchive;
+	}
 	
+	public String toString() {
+		return "[" + parentArchive.toString() + "]" + getAbsolutePath();
+	}
 	
 }

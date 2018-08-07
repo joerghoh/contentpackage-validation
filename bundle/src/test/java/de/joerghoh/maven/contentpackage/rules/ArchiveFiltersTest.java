@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import de.joerghoh.maven.contentpackage.beans.ArchiveEntry;
 import de.joerghoh.maven.contentpackage.beans.ZipArchiveBean;
-import de.joerghoh.maven.contentpackage.beans.ZipArchiveBeanTest;
+import de.joerghoh.maven.contentpackage.beans.BeanTest;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ArchiveFiltersTest {
@@ -27,13 +27,15 @@ public class ArchiveFiltersTest {
 	private static final Logger LOG = LoggerFactory.getLogger(ArchiveFiltersTest.class);
 	
 	ZipArchiveBean zipArchive;
+	ArchiveEntry root;
 	
 	@Before
 	public void setup() throws IOException {
-		File f = new File (ZipArchiveBeanTest.class.getClassLoader().getResource("ZipArchiveBeanTest.zip").getFile());
+		File f = new File (BeanTest.class.getClassLoader().getResource("ZipArchiveBeanTest.zip").getFile());
 		assertTrue(f.exists());
 		zipArchive = new ZipArchiveBean(f);
 		assertTrue(zipArchive != null);
+		root = zipArchive.getRoot();
 	}
 	
 	@After
@@ -43,14 +45,24 @@ public class ArchiveFiltersTest {
 	
 	@Test
 	public void testFilters() throws IOException {
-		ArchiveEntry root = zipArchive.getRoot();
 		List<ArchiveEntry> jcrNodes = root.getStream()
 			.filter(ArchiveFilters.isJcrPath)
 			.collect(Collectors.toList());
-		Optional<ArchiveEntry> appsFolder = root.getNode("/jcr_root/apps");
+		Optional<ArchiveEntry> appsFolder = root.getNode("jcr_root/apps/");
 		assertTrue(jcrNodes.contains(appsFolder.get()));
-		
-		
 	}
+	
+	@Test
+	public void testBundleFilter() {
+		assertTrue(
+			root.getStream()
+			.filter(ArchiveFilters.isBundle)
+			.findFirst()
+			.get()
+			.getAbsolutePath()
+			.equals("jcr_root/apps/myapp/install/mycustombundle.jar")
+		);
+	}
+	
 	
 }

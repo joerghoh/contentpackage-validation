@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>de.joerghoh.maven</groupId>
+	<artifactId>contentpackage-validation-maven-plugin</artifactId>
+	<version>1.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>de.joerghoh.maven</groupId>
+				<artifactId>contentpackage-validation-maven-plugin</artifactId>
+				
+				  <configuration>
+				    <breakBuild>true</breakBuild>
+				    <allowSubpackages>true</allowSubpackages>
+				    <whitelistedPaths>
+				      <param>.*</param>
+				      <param>!/jcr_root/libs/.*</param>
+				      <param>!/jcr_root/content/.*</param>
+				      <param>/META-INF/.*</param>
+				    </whitelistedPaths>
+				  </configuration>
+			</plugin>
+		</plugins>
+	</build>
+	
+	
+</project>
+	

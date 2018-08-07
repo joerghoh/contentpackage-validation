@@ -27,15 +27,15 @@ import de.joerghoh.maven.contentpackage.beans.ArchiveEntry;
 import de.joerghoh.maven.contentpackage.beans.ZipArchiveBean;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ZipArchiveBeanTest {
+public class BeanTest {
 	
-	private static final Logger LOG = LoggerFactory.getLogger(ZipArchiveBeanTest.class);
+	private static final Logger LOG = LoggerFactory.getLogger(BeanTest.class);
 	
 	ZipArchiveBean zipArchive;
 	
 	@Before
 	public void setup() throws IOException {
-		File f = new File (ZipArchiveBeanTest.class.getClassLoader().getResource("ZipArchiveBeanTest.zip").getFile());
+		File f = new File (BeanTest.class.getClassLoader().getResource("ZipArchiveBeanTest.zip").getFile());
 		assertTrue(f.exists());
 		zipArchive = new ZipArchiveBean(f);
 		assertTrue(zipArchive != null);
@@ -122,6 +122,25 @@ public class ZipArchiveBeanTest {
 	}
 	
 	
+	@Test
+	public void testSubpackages() throws IOException {
+		ArchiveEntry root = zipArchive.getRoot();
+		Optional<ArchiveEntry> acs = root.getNode("jcr_root/etc/packages/adobe/consulting/acs-aem-commons-content-3.17.0.zip");
+		assertTrue(acs.isPresent());
+		List<ArchiveBean> subPackages = zipArchive.getSubpackages();
+		assertEquals(1,subPackages.size());
+		ArchiveBean sp = subPackages.get(0);
+		sp.getParentArchive().equals(zipArchive);
+	}
+	
+	@Test
+	public void testSubpackageContent() throws IOException {
+		List<ArchiveBean> subPackages = zipArchive.getSubpackages();
+		ArchiveBean sp = subPackages.get(0);
+		assertNotNull(sp.getRoot());
+		assertNotNull(sp.getRoot().getChildren());
+		assertNotNull(sp.getRoot().getStream());
+	}
 	
 	
 }

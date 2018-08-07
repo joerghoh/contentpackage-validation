@@ -39,6 +39,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <finalname>${project.build.finalName}</finalname>
     </properties>
+    
+    <dependencies>
+		<dependency>
+		    <groupId>com.adobe.acs</groupId>
+		    <artifactId>acs-aem-commons-content</artifactId>
+		    <version>3.17.0</version>
+		    <type>content-package</type>
+		    <classifier>min</classifier> 
+		</dependency>
+    </dependencies>
 
     <!-- ====================================================================== -->
     <!-- B U I L D   D E F I N I T I O N                                        -->
@@ -118,6 +128,13 @@
                     <verbose>true</verbose>
                     <failOnError>true</failOnError>
                     <group>testgroup</group>
+                    <subPackages>
+                    	<subPackage>
+                    		<groupId>com.adobe.acs</groupId>
+			                <artifactId>acs-aem-commons-content</artifactId>
+			                <filter>true</filter>
+                    	</subPackage>
+                    </subPackages>
                 </configuration>
             </plugin>
             <plugin>
