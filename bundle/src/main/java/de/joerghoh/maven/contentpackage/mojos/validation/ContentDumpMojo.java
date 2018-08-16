@@ -19,19 +19,24 @@
 package de.joerghoh.maven.contentpackage.mojos.validation;
 
 import java.io.File;
+import java.io.IOException;
 
-import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
+import de.joerghoh.maven.contentpackage.beans.ZipArchiveBean;
+
 @Mojo (name="dumpContent", defaultPhase=LifecyclePhase.VERIFY, requiresProject=false )
-public class ContentDumpMojo extends AbstractValidationMojo {
+public class ContentDumpMojo extends AbstractMojo {
 		
 	@Parameter (property="validation.filename", defaultValue="${project.build.directory}/${project.build.finalName}")
 	private File target;
+	
+	private String TARGET_EXTENSION = ".zip";
 	
 	
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -40,11 +45,18 @@ public class ContentDumpMojo extends AbstractValidationMojo {
 			target = new File (target.getAbsolutePath() + TARGET_EXTENSION);
 		}
 
-		getFileContent(target).forEach(cpe -> {
-			String msg = String.format("[%s] %s", cpe.getArchiveFilename(), cpe.getPath());
-			getLog().info(msg);
-			
-		});
+		ZipArchiveBean archive;
+		try {
+			archive = new ZipArchiveBean(target);
+			archive.getEntriesFlat().forEach(entry -> {
+				String msg = String.format("%s", entry.getAbsolutePath());
+				getLog().info(msg);
+			});
+		} catch (IOException e) {
+			throw new MojoExecutionException("Caught IO Exception",e);
+		}
+		
+
 		
 	}
 	

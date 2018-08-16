@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -37,7 +38,7 @@ import de.joerghoh.maven.contentpackage.beans.ArchiveEntry;
 import de.joerghoh.maven.contentpackage.beans.ZipArchiveBean;
 
 @Mojo (name="validate", defaultPhase=LifecyclePhase.VERIFY, requiresProject=false )
-public class ContentValidationMojo extends AbstractValidationMojo {
+public class ContentValidationMojo extends AbstractMojo {
 	
 	private static final String SUBPACKAGE_EXPRESSION = "/jcr_root/etc/packages/.*.zip";
 	
@@ -56,6 +57,7 @@ public class ContentValidationMojo extends AbstractValidationMojo {
 	List<String> positiveStatements = new ArrayList<>();
 	List<String> negativeStatements = new ArrayList<>();
 
+	private static final String TARGET_EXTENSION = ".zip";
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
