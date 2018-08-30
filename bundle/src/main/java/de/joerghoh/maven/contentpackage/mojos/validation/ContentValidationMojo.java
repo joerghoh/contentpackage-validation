@@ -82,7 +82,6 @@ public class ContentValidationMojo extends AbstractMojo {
 	}
 	
 	protected void processRules() {
-
 		whitelistedPaths.forEach(regex -> {
 			if (regex.startsWith("!")) {
 				negativeStatements.add(regex.substring(1));
@@ -93,8 +92,8 @@ public class ContentValidationMojo extends AbstractMojo {
 		});
 	}
 	
-	public List<String> validateArchive (ArchiveBean archive) throws IOException {
-		List<String> policyViolations = new ArrayList<>();
+	public List<Violation> validateArchive (ArchiveBean archive) throws IOException {
+		List<Violation> policyViolations = new ArrayList<>();
 		archive.getRoot().getStream()
 			.filter(e -> filterPathViolations(e,policyViolations))
 			.filter(e -> checkForSubpackages(e, policyViolations))
@@ -118,9 +117,7 @@ public class ContentValidationMojo extends AbstractMojo {
 	 * @param policyViolations the list of violations
 	 * @return false if the violation is deteced, true otherwise
 	 */
-	boolean filterPathViolations (ArchiveEntry entry, List<String> policyViolations) {
-		
-
+	boolean filterPathViolations (ArchiveEntry entry, List<Violation> policyViolations) {
 			
 		// there must be at least 1 match on the positiveStatement list
 		boolean positiveMatch = positiveStatements.stream()
@@ -135,18 +132,18 @@ public class ContentValidationMojo extends AbstractMojo {
 		getLog().debug(String.format("%s: positiveMatch=%s, negativeMatch=%s",entry.getAbsolutePath(),positiveMatch, negativeMatch));
 		boolean isCompliant = (positiveMatch && !negativeMatch);
 		if (! isCompliant) {
-			String msg = String.format("detected violation of path rules: %s", entry.toString());
+			String msg = String.format("detected violation of path rules: %s", entry.getAbsolutePath());
 			getLog().debug(msg);
-			policyViolations.add(msg);
+			policyViolations.add(new Violation(entry, msg));
 		}
 		return isCompliant;
 	}
 	
-	boolean checkForSubpackages (ArchiveEntry archiveEntry, List<String> policyViolations) {
+	boolean checkForSubpackages (ArchiveEntry archiveEntry, List<Violation> policyViolations) {
 		boolean isSubPackage = archiveEntry.getAbsolutePath().matches(SUBPACKAGE_EXPRESSION);
 		if (isSubPackage && !allowSubpackages) {
-			String msg = String.format("[%s] detected subpackage at: %s", archiveEntry.toString(),archiveEntry.getAbsolutePath());
-			policyViolations.add(msg);
+			String msg = String.format("detected subpackage at: %s", archiveEntry.getAbsolutePath());
+			policyViolations.add(new Violation(archiveEntry, msg));
 		}
 		return !isSubPackage;
 	}
@@ -161,13 +158,22 @@ public class ContentValidationMojo extends AbstractMojo {
 	 * @param policyViolations
 	 * @throws MojoExecutionException
 	 */
-	protected void reportViolations(List<String> policyViolations) throws MojoExecutionException {
+	protected void reportViolations(List<Violation> policyViolations) throws MojoExecutionException {
+		
 		if (policyViolations.size() > 0) {
-			String msg = String.format("%d violation(s) against policy (%s)", policyViolations.size(), getPolicyString()); 
+			String msg = String.format("violation(s) against policy (%s)", getPolicyString()); 
 			getLog().warn(msg);
-			policyViolations.forEach(s -> getLog().warn(s));
+			long violationCount = policyViolations.stream()
+				.filter(v -> !v.getEntry().isDirectory())
+				.filter(v -> {
+					String message = String.format("[%s] %s", v.getEntry().getArchive().getName(),v.getMessage());
+					getLog().warn(message);
+					return true;
+				})
+				.count();
 			if (breakBuild) {
-				throw new MojoExecutionException("policy violation detected, please check build logs");
+				throw new MojoExecutionException(String.format(" %d policy violation(s) detected, "
+						+ "please check build logs",violationCount));
 			}
 		}
 	}
@@ -177,6 +183,27 @@ public class ContentValidationMojo extends AbstractMojo {
 		return String.format("whitelisted paths = [%s], allowSubpackages = %s",String.join(",", whitelistedPaths),allowSubpackages );
 	}
 	
+	
+	
+	protected class Violation {
+		
+		private ArchiveEntry entry;
+		private String message;
+		
+		public Violation (ArchiveEntry e, String msg ) {
+			this.entry = e;
+			this.message = msg;
+		}
+		
+		ArchiveEntry getEntry () {
+			return entry;
+		}
+		
+		String getMessage () {
+			return message;
+		}
+		
+ 	}
 
 	
 	

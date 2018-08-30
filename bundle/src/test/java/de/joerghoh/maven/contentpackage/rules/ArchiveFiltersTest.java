@@ -49,6 +49,7 @@ public class ArchiveFiltersTest {
 			.filter(ArchiveFilters.isJcrPath)
 			.collect(Collectors.toList());
 		Optional<ArchiveEntry> appsFolder = root.getNode("jcr_root/apps/");
+		assertTrue(appsFolder.isPresent());
 		assertTrue(jcrNodes.contains(appsFolder.get()));
 	}
 	
@@ -60,7 +61,7 @@ public class ArchiveFiltersTest {
 			.findFirst()
 			.get()
 			.getAbsolutePath()
-			.equals("jcr_root/apps/myapp/install/mycustombundle.jar")
+			.equals("/jcr_root/apps/myapp/install/mycustombundle.jar")
 		);
 	}
 	

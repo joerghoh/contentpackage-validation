@@ -87,7 +87,7 @@ public class ArchiveEntry {
 	
 	/**
 	 * get the absolute path of this ArchiveEntry in the archive
-	 * @return
+	 * @return the absolute path as string including a leading slash ("/")
 	 */
 	public String getAbsolutePath() {
 		List<String> pathElements = new ArrayList<>();
@@ -101,7 +101,7 @@ public class ArchiveEntry {
 		if (getParent() == null) {
 			return "/";
 		}
-		return String.join("/", pathElements).substring(1);
+		return String.join("/", pathElements);
 	}
 	
 	public boolean isDirectory() {

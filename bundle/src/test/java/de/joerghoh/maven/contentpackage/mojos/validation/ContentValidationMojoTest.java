@@ -10,6 +10,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import de.joerghoh.maven.contentpackage.beans.ZipArchiveBean;
+import de.joerghoh.maven.contentpackage.mojos.validation.ContentValidationMojo.Violation;
 
 public class ContentValidationMojoTest extends AbstractMojoTestCase {
 
@@ -35,7 +36,7 @@ public class ContentValidationMojoTest extends AbstractMojoTestCase {
         mojo.processRules();
         
         ZipArchiveBean archive = new ZipArchiveBean(mojo.target);
-		List<String> exceptions = mojo.validateArchive(archive);
+		List<Violation> exceptions = mojo.validateArchive(archive);
 		assertEquals(0,exceptions.size());        
 	}
 	
@@ -47,11 +48,11 @@ public class ContentValidationMojoTest extends AbstractMojoTestCase {
 
         ContentValidationMojo mojo = (ContentValidationMojo) lookupMojo( "validate", pom );
         mojo.target = new File("src/test/resources/ZipArchiveBeanTest.zip");
-        mojo.whitelistedPaths.add("!jcr_root/etc/dam/video/.*");
+        mojo.whitelistedPaths.add("!/jcr_root/etc/dam/video/.*");
         mojo.processRules();
         
         ZipArchiveBean archive = new ZipArchiveBean(mojo.target);
-		List<String> exceptions = mojo.validateArchive(archive);
+		List<Violation> exceptions = mojo.validateArchive(archive);
 		assertEquals(7,exceptions.size());     
 	}
 	

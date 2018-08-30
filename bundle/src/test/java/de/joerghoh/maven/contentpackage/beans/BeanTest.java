@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -67,7 +68,24 @@ public class BeanTest {
 		assertTrue (subnode1.getParent().equals(root));
 		assertTrue(subnode1.isDirectory());
 	}
-
+	
+	@Test
+	public void entriesMustHaveLeadingSlash() throws IOException {
+		ArchiveEntry jcrRoot = zipArchive.getRoot().getChild("jcr_root").get();
+		assertEquals("/jcr_root", jcrRoot.getAbsolutePath());
+	}
+	
+	@Test
+	public void rootNodeIsDirectory() throws IOException {
+		ArchiveEntry root = zipArchive.getRoot();
+		assertTrue("Root is not a directory",root.isDirectory());
+	}
+	
+	@Test
+	public void testDirectories() throws IOException {
+		ArchiveEntry jcrRoot = zipArchive.getRoot().getChild("jcr_root").get();
+		assertTrue("jcr_root is not a directory", jcrRoot.isDirectory());
+	}
 	
 
 	
@@ -107,7 +125,7 @@ public class BeanTest {
 		assertTrue(config.equals( config1));
 		assertTrue(config.isPresent());
 		String path = config.get().getAbsolutePath();
-		assertTrue("META-INF/vault/properties.xml".equals(path));
+		assertEquals("/META-INF/vault/properties.xml",path);
 	}
 	
 	@Test

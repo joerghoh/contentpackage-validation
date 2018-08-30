@@ -19,7 +19,7 @@
 				    <whitelistedPaths>
 				      <param>.*</param>
 				      <param>!/jcr_root/libs/.*</param>
-				      <param>!/jcr_root/content/.*</param>
+				      <param>!/jcr_root/content/project.*</param>
 				      <param>/META-INF/.*</param>
 				    </whitelistedPaths>
 				  </configuration>
