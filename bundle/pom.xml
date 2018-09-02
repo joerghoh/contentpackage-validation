@@ -1,12 +1,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>de.joerghoh.maven</groupId>
 	<artifactId>contentpackage-validation-maven-plugin</artifactId>
-	<version>1.1-SNAPSHOT</version>
-	<packaging>maven-plugin</packaging>
-
 	<name>Contentpackage-validation-maven-plugin</name>
+	<packaging>maven-plugin</packaging>
+	
+	<parent>
+		<artifactId>contentpackagevalidation-reactor</artifactId>
+    	<version>1.1-SNAPSHOT</version>
+    	<groupId>de.joerghoh.maven.contentpackagevalidation</groupId>
+	</parent>
+	
+	<prerequisites>
+    	<maven>3.2.5</maven>
+    </prerequisites>
+
+
 	
 	<properties>
     	<maven.compiler.source>1.8</maven.compiler.source>
@@ -41,7 +50,7 @@
 		<dependency>
 		    <groupId>org.apache.jackrabbit.vault</groupId>
 		    <artifactId>org.apache.jackrabbit.vault</artifactId>
-		    <version>3.1.44</version>
+		    <version>3.2.0</version>
 		    <scope>compile</scope>
 		</dependency>
 		<dependency>
