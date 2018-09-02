@@ -7,7 +7,7 @@
 	
 	<parent>
 		<artifactId>contentpackagevalidation-reactor</artifactId>
-    	<version>1.4</version>
+    	<version>1.5-SNAPSHOT</version>
     	<groupId>de.joerghoh.maven.contentpackagevalidation</groupId>
 	</parent>
 	
