@@ -13,13 +13,13 @@ Additionally to a pure reporting of collisions with these rules you can also bre
 provide the name of the content package via the "validation.filename" system property.
 
 ```
-mvn de.joerghoh.maven:contentpackage-validation-maven-plugin:validate -Dvalidation.filename=<path_to_the_contentpackage> "-Dvalidation.whitelistedPaths=!/jcr_root/apps/.*\.jar"  -Dvalidation.breakBuildOnValiationFailures=true
+mvn de.joerghoh.maven:contentpackage-validation-maven-plugin:validate -Dvalidation.filename=<path_to_the_contentpackage> "-Dvalidation.pathRules=!/jcr_root/apps/.*\.jar"  -Dvalidation.breakBuildOnValiationFailures=true
 ```
 
 This is probably the most often used mode; it allows you to scan a content package for jar bundles (full regular expression support!) and fail if there is one encountered. You can also check for multiple expressions at once:
 
 ```
-"-Dvalidation.filteredPaths=!/jcr_root/apps.*\.jar,!/jcr_root/apps/.*/config.*/.*\.conf"
+"-Dvalidation.pathRules=!/jcr_root/apps.*\.jar,!/jcr_root/apps/.*/config.*/.*\.conf"
 ```
 
 ## Running as part of the build
@@ -31,15 +31,15 @@ Example how to configure:
 <plugin>
   <groupId>de.joerghoh.maven</groupId>
   <artifactId>contentpackage-validation-maven-plugin</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.1-SNAPSHOT</version>
   <configuration>
     <breakBuild>true</breakBuild>
     <allowSubpackages>true</allowSubpackages>
-    <whitelistedPaths>
+    <pathRules>
       <param>!/jcr_root/libs/.*</param>
       <param>!/jcr_root/content/.*</param>
       <param>/META-INF/.*</param>
-    </whitelistedPaths>
+    </pathRules>
   </configuration>
 
 </plugin>
@@ -47,7 +47,7 @@ Example how to configure:
 This configuration will disallow nodes in /libs and /content, but accept the META-INF directory (which is kind of boilderplate and should always be there).
 
 ## Building regular expressions
-The whitelistedPaths setting allows full regular expressions; you can build positive and negative statements like this:
+The pathRules setting allows full regular expressions; you can build positive and negative statements like this:
 
 * positive statements (e.g. ``/jcr_content/apps/myapp/.*``) make sure that certain content is allowed in a package.
 * negative statements (e.g. ``!/jcr_content/libs.*``) make sure that any occurrence of paths matching that pattern will be considered as policy violations and reported.

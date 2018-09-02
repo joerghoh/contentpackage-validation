@@ -48,7 +48,7 @@ public class ContentValidationMojoTest extends AbstractMojoTestCase {
 
         ContentValidationMojo mojo = (ContentValidationMojo) lookupMojo( "validate", pom );
         mojo.target = new File("src/test/resources/ZipArchiveBeanTest.zip");
-        mojo.whitelistedPaths.add("!/jcr_root/etc/dam/video/.*");
+        mojo.pathRules.add("!/jcr_root/etc/dam/video/.*");
         mojo.processRules();
         
         ZipArchiveBean archive = new ZipArchiveBean(mojo.target);

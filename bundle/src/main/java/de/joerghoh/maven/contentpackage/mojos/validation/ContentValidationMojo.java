@@ -42,8 +42,8 @@ public class ContentValidationMojo extends AbstractMojo {
 	
 	private static final String SUBPACKAGE_EXPRESSION = "/jcr_root/etc/packages/.*.zip";
 	
-	@Parameter (property="validation.whitelistedPaths")
-	ArrayList<String> whitelistedPaths;
+	@Parameter (property="validation.pathRules")
+	ArrayList<String> pathRules;
 	
 	@Parameter (property="validation.filename", defaultValue="${project.build.directory}/${project.build.finalName}")
 	protected File target;
@@ -82,7 +82,7 @@ public class ContentValidationMojo extends AbstractMojo {
 	}
 	
 	protected void processRules() {
-		whitelistedPaths.forEach(regex -> {
+		pathRules.forEach(regex -> {
 			if (regex.startsWith("!")) {
 				negativeStatements.add(regex.substring(1));
 			} else {
@@ -180,7 +180,7 @@ public class ContentValidationMojo extends AbstractMojo {
 	
 
 	String getPolicyString() {
-		return String.format("whitelisted paths = [%s], allowSubpackages = %s",String.join(",", whitelistedPaths),allowSubpackages );
+		return String.format("whitelisted paths = [%s], allowSubpackages = %s",String.join(",", pathRules),allowSubpackages );
 	}
 	
 	

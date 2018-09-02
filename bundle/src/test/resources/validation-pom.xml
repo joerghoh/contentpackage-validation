@@ -16,12 +16,12 @@
 				  <configuration>
 				    <breakBuild>true</breakBuild>
 				    <allowSubpackages>true</allowSubpackages>
-				    <whitelistedPaths>
+				    <pathRules>
 				      <param>.*</param>
 				      <param>!/jcr_root/libs/.*</param>
 				      <param>!/jcr_root/content/project.*</param>
 				      <param>/META-INF/.*</param>
-				    </whitelistedPaths>
+				    </pathRules>
 				  </configuration>
 			</plugin>
 		</plugins>
