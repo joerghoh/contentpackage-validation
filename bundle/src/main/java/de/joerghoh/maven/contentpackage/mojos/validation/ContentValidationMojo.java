@@ -114,7 +114,7 @@ public class ContentValidationMojo extends AbstractMojo {
 	/**
 	 * validate a content package entry against the path filter rules
 	 * @param entry
-	 * @param policyViolations the list of violations
+	 * @param policyViolations the list of violations; in case
 	 * @return false if the violation is deteced, true otherwise
 	 */
 	boolean filterPathViolations (ArchiveEntry entry, List<Violation> policyViolations) {

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,7 +20,6 @@ public abstract class ArchiveBean {
 	private static Logger LOG = LoggerFactory.getLogger(ArchiveBean.class);
 
 	private Archive archive;
-	private ArchiveBean parent; // the parent Archive
 	private ArchiveEntry rootEntry;
 	
 	protected boolean isClosed; // must be accessible from inheriting classes

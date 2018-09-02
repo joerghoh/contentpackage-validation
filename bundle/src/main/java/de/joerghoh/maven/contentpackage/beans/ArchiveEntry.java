@@ -2,7 +2,6 @@ package de.joerghoh.maven.contentpackage.beans;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -122,7 +121,11 @@ public class ArchiveEntry {
 		return IOUtils.toString(is.getByteStream(),encoding);
 	}
 	
-	
+	/**
+	 * get the content of the node as stream; the caller is responsible to close it
+	 * @return the stream
+	 * @throws IOException
+	 */
 	public InputStream getInputStream() throws IOException {
 		return parentArchive.getArchive().getInputSource(entry).getByteStream();
 	}
