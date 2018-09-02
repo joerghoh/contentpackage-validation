@@ -22,7 +22,7 @@
     <!-- P R O J E C T  D E S C R I P T I O N                                   -->
     <!-- ====================================================================== -->
     <artifactId>contentpackagevalidation-reactor</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.4</version>
     <groupId>de.joerghoh.maven.contentpackagevalidation</groupId>
     <packaging>pom</packaging>
     <name>Contentpackage Validation Reactor</name>
@@ -31,7 +31,7 @@
 
 	<scm>
   	  <developerConnection>scm:git:git@github.com:joerghoh/contentpackage-validation.git</developerConnection>
-  	  <tag>HEAD</tag>
+  	  <tag>contentpackagevalidation-reactor-1.4</tag>
   	</scm>
     
     <properties>

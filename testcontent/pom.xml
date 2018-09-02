@@ -23,7 +23,7 @@
     <parent>
 		<groupId>de.joerghoh.maven.contentpackagevalidation</groupId>
 		<artifactId>contentpackagevalidation-reactor</artifactId>
-		<version>1.3-SNAPSHOT</version>
+		<version>1.4</version>
     </parent>
 
     <!-- ====================================================================== -->
