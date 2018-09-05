@@ -1,6 +1,5 @@
 package de.joerghoh.maven.contentpackage.rules;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -14,17 +13,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import de.joerghoh.maven.contentpackage.beans.ArchiveEntry;
-import de.joerghoh.maven.contentpackage.beans.ZipArchiveBean;
 import de.joerghoh.maven.contentpackage.beans.BeanTest;
+import de.joerghoh.maven.contentpackage.beans.ZipArchiveBean;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ArchiveFiltersTest {
-
-	private static final Logger LOG = LoggerFactory.getLogger(ArchiveFiltersTest.class);
 	
 	ZipArchiveBean zipArchive;
 	ArchiveEntry root;
@@ -45,7 +40,7 @@ public class ArchiveFiltersTest {
 	
 	@Test
 	public void testFilters() throws IOException {
-		List<ArchiveEntry> jcrNodes = root.getStream()
+		List<ArchiveEntry> jcrNodes = root.getSubnodes()
 			.filter(ArchiveFilters.isJcrPath)
 			.collect(Collectors.toList());
 		Optional<ArchiveEntry> appsFolder = root.getNode("jcr_root/apps/");
@@ -56,7 +51,7 @@ public class ArchiveFiltersTest {
 	@Test
 	public void testBundleFilter() {
 		assertTrue(
-			root.getStream()
+			root.getSubnodes()
 			.filter(ArchiveFilters.isBundle)
 			.findFirst()
 			.get()

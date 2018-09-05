@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import de.joerghoh.maven.contentpackage.rules.ArchiveFilters;
 
-public abstract class ArchiveBean {
+public abstract class ArchiveBean implements AutoCloseable {
 	
 	private static Logger LOG = LoggerFactory.getLogger(ArchiveBean.class);
 
@@ -73,7 +73,7 @@ public abstract class ArchiveBean {
  	
 	public List<ArchiveBean> getSubpackages() throws IOException {
 		Stream<ArchiveEntry> potentialPackages = this.getRoot().getNode("jcr_root/etc/packages")
-				.flatMap(n -> Optional.of(n.getStream()))
+				.flatMap(n -> Optional.of(n.getSubnodes()))
 				.orElseGet(() -> Stream.of());
 		return potentialPackages
 			.filter(ArchiveFilters.isContentPackage)
@@ -89,6 +89,10 @@ public abstract class ArchiveBean {
 			.collect(Collectors.toList());		
 	}
 	
+	/**
+	 * 
+	 * @throws IOException
+	 */
 	public void close() throws IOException {
 		for (ArchiveBean a : getSubpackages()) {
 			a.close();

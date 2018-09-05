@@ -8,29 +8,18 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import de.joerghoh.maven.contentpackage.beans.ArchiveEntry;
-import de.joerghoh.maven.contentpackage.beans.ZipArchiveBean;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BeanTest {
-	
-	private static final Logger LOG = LoggerFactory.getLogger(BeanTest.class);
 	
 	ZipArchiveBean zipArchive;
 	
@@ -157,7 +146,7 @@ public class BeanTest {
 		ArchiveBean sp = subPackages.get(0);
 		assertNotNull(sp.getRoot());
 		assertNotNull(sp.getRoot().getChildren());
-		assertNotNull(sp.getRoot().getStream());
+		assertNotNull(sp.getRoot().getSubnodes());
 	}
 	
 	

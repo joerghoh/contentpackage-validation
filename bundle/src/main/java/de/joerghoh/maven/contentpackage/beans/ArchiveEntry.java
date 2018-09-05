@@ -89,6 +89,11 @@ public class ArchiveEntry {
 	 * @return the absolute path as string including a leading slash ("/")
 	 */
 	public String getAbsolutePath() {
+		// root node handling
+		if (getParent() == null) {
+			return "/";
+		}
+		
 		List<String> pathElements = new ArrayList<>();
 		ArchiveEntry elem = this;
 		pathElements.add(elem.getName());
@@ -97,9 +102,6 @@ public class ArchiveEntry {
 			pathElements.add(elem.getName());
 		}
 		Collections.reverse(pathElements);
-		if (getParent() == null) {
-			return "/";
-		}
 		return String.join("/", pathElements);
 	}
 	
@@ -134,7 +136,7 @@ public class ArchiveEntry {
 	 * Return the node and its child nodes recursively in a stream
 	 * @return
 	 */
-	public Stream<ArchiveEntry> getStream() {
+	public Stream<ArchiveEntry> getSubnodes() {
 		List<ArchiveEntry> result = new ArrayList<>();
 		result.add(this);
 		result.addAll(recurse(this));

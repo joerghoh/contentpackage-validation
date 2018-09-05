@@ -94,7 +94,7 @@ public class ContentValidationMojo extends AbstractMojo {
 	
 	public List<Violation> validateArchive (ArchiveBean archive) throws IOException {
 		List<Violation> policyViolations = new ArrayList<>();
-		archive.getRoot().getStream()
+		archive.getRoot().getSubnodes()
 			.filter(e -> filterPathViolations(e,policyViolations))
 			.filter(e -> checkForSubpackages(e, policyViolations))
 			.collect(Collectors.toList());
